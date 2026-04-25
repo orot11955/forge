@@ -1,0 +1,15 @@
+id: go
+label:
+  en: Go module
+  ko: Go 모듈
+description:
+  en: Go module initialized with go mod init
+  ko: "go mod init으로 초기화된 Go 모듈"
+type: go
+command:
+  executable: go
+  args:
+    - mod
+    - init
+    - "{{ goModule }}"
+runIn: project

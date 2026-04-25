@@ -1,0 +1,160 @@
+version:
+  current: "Forge 버전 %s"
+
+config:
+  pathLabel: "설정 파일 경로:"
+  languageSet: "언어를 %s로 설정했습니다"
+  invalidLanguage: "지원하지 않는 언어입니다: %s (지원: en, ko)"
+
+workbench:
+  initSuccess: "Workbench를 초기화했습니다: %s"
+  initExists: "이미 Workbench가 존재합니다: %s"
+  initNothingChanged: "변경 사항이 없습니다."
+  statusTitle: "Workbench 상태"
+  rootLabel: "루트:"
+  idLabel: "ID:"
+  projectsLabel: "프로젝트 수:"
+  defaultLabel: "기본 여부:"
+  defaultTrue: "true"
+  defaultFalse: "false"
+  initDefaultSet: "기본 Workbench로 설정했습니다: %s"
+  initDefaultExists: "기본 Workbench는 이미 설정되어 있습니다: %s"
+  initDefaultChangeHint: "변경하려면: forge work use %s"
+  notFound: "Workbench를 찾을 수 없습니다."
+  notFoundHint1: "다음 중 하나를 실행하세요:"
+  notFoundHint2a: "  forge work init ~/Workbench"
+  notFoundHint2b: "  forge status --workbench ~/Workbench"
+
+project:
+  initSuccess: "프로젝트를 초기화했습니다: %s"
+  initExists: "이미 초기화된 프로젝트입니다: %s"
+  initRunStatus: "'forge status'로 상태를 확인하세요."
+  notFound: "Project Root를 찾을 수 없습니다."
+  notFoundHint1: "다음 중 하나를 실행하세요:"
+  notFoundHint2a: "  forge init"
+  notFoundHint2b: "  cd <forge-project>"
+  statusTitle: "프로젝트 상태"
+  nameLabel: "프로젝트:"
+  typeLabel: "타입:"
+  statusLabel: "상태:"
+  locationLabel: "위치:"
+  pathLabel: "경로:"
+  workbenchLabel: "Workbench:"
+  lifecycleLabel: "생명주기:"
+  contextSection: "Context"
+  lifecycleSection: "Lifecycle"
+  templateLabel: "Template:"
+  currentLabel: "Current:"
+
+check:
+  title: "체크 결과"
+  requiredPassed: "필수 체크는 모두 통과했습니다."
+  requiredFailed: "필수 체크가 실패했습니다."
+  optionalFailed: "일부 선택 체크가 실패했습니다."
+  lifecycleTransition: "생명주기:"
+  lifecycleArrow: "%s → %s"
+  lifecycleUnchanged: "생명주기는 변경하지 않았습니다."
+  nextSuggestion: "다음 추천 명령어:"
+
+list:
+  title: "%s의 프로젝트 목록"
+  empty: "등록된 프로젝트가 없습니다."
+  headerName: "이름"
+  headerType: "타입"
+  headerStatus: "상태"
+  headerLocation: "위치"
+  headerPath: "경로"
+  headerState: "상태"
+
+create:
+  unknownType: "지원하지 않는 프로젝트 타입: %s (지원: generic, next, nest, go, java)"
+  pathExists: "대상 경로가 이미 존재하고 비어있지 않습니다: %s"
+  running: "실행 중:"
+  rolledBack: "롤백: 빈 디렉터리를 제거했습니다 %s"
+  rollbackKept: "디렉터리가 비어있지 않아 보존했습니다: %s"
+  success: "프로젝트를 생성했습니다: %s (위치: %s)"
+  dryRunHeader: "드라이런 — 실제로 기록되지 않습니다."
+  dryRunPlan: "실행 계획:"
+
+gen:
+  wrote: "생성: %s"
+  exists: "이미 존재합니다 (--force로 덮어쓰기): %s"
+  dryRunHeader: "드라이런 — 실제로 기록되지 않습니다."
+  done: "생성을 완료했습니다."
+  unsupportedType: "이 프로젝트 타입은 지원하지 않습니다: %s"
+
+run:
+  scriptNotFound: "스크립트를 찾을 수 없습니다: %s"
+  scriptListHeader: "사용 가능한 스크립트:"
+  starting: "실행: %s"
+  exitCode: "종료 코드: %d"
+
+logs:
+  title: "명령 로그:"
+  empty: "로그가 없습니다."
+
+tool:
+  showTitle: "Toolchain"
+  doctorTitle: "Toolchain 진단"
+  policyLabel: "정책:"
+  runtimesLabel: "런타임"
+  pmsLabel: "패키지 매니저"
+  systemLabel: "시스템 도구"
+  none: "(선언된 항목 없음)"
+  ok: "정상"
+  missing: "없음"
+  versionUnknown: "버전 미상"
+
+git:
+  notRepo: "Git 저장소가 아닙니다: %s"
+  statusTitle: "Git 상태"
+  branchLabel: "브랜치:"
+  remoteLabel: "원격:"
+  cleanLabel: "작업 트리 깨끗함"
+  dirtyLabel: "커밋되지 않은 변경:"
+  noRemote: "(원격 없음)"
+  noUpstream: "(업스트림 없음)"
+
+docker:
+  daemonUp: "Docker 데몬: 연결됨"
+  daemonDown: "Docker 데몬: 연결 안 됨"
+  notInstalled: "docker가 설치되어 있지 않습니다"
+  destructiveConfirm: "위험한 Docker 명령입니다. 계속할까요?"
+  cancelled: "취소했습니다."
+
+compose:
+  noFile: "Compose 파일을 찾을 수 없습니다: %s (docker-compose.yml, compose.yaml, compose.yml 검색)"
+  fileLabel: "Compose 파일:"
+  envMissing: ".env가 프로젝트 루트에 없습니다 (compose env_file 실패 가능)"
+  destructiveConfirm: "컨테이너를 중지하고 제거합니다. 계속할까요?"
+  cancelled: "취소했습니다."
+
+deploy:
+  noTargets: "정의된 대상이 없습니다. .forge/targets.yaml을 먼저 작성하세요."
+  unknownTarget: "알 수 없는 대상: %s"
+  unsupportedType: "지원하지 않는 배포 타입: %s"
+  dryRunHeader: "드라이런 — 원격 명령은 실행하지 않습니다."
+  planTitle: "배포 계획:"
+  starting: "%s 배포 시작"
+  step: "→ %s"
+  healthOk: "헬스체크 정상 (%d)"
+  healthFail: "헬스체크 실패: %s"
+  success: "배포 성공: %s"
+  failure: "배포 실패: %s"
+  gitDirty: "작업 트리에 커밋되지 않은 변경이 있습니다. 배포 전 정리하세요."
+  branchMismatch: "브랜치 불일치: 로컬=%s, 대상=%s"
+
+doctor:
+  title: "Forge 진단"
+  configLabel: "전역 설정:"
+  workbenchLabel: "기본 Workbench:"
+  workbenchYamlLabel: "Workbench YAML:"
+  registryLabel: "Registry:"
+  projectLabel: "프로젝트 루트:"
+  projectYamlLabel: "Project YAML:"
+  gitLabel: "Git:"
+  dockerLabel: "Docker:"
+  sshLabel: "SSH:"
+  ok: "정상"
+  missing: "없음"
+  notFound: "찾지 못함"

@@ -1,0 +1,24 @@
+id: next
+label:
+  en: Next.js web app
+  ko: Next.js 웹 앱
+description:
+  en: Next.js App Router based web project
+  ko: Next.js App Router 기반 웹 프로젝트
+type: next
+defaultPackageManager: yarn
+command:
+  executable: npx
+  args:
+    - --yes
+    - create-next-app@latest
+    - "{{ projectName }}"
+    - --typescript
+    - --eslint
+    - --app
+    - --src-dir
+    - --no-tailwind
+    - --import-alias
+    - "@/*"
+    - --use-{{ packageManager }}
+runIn: parent

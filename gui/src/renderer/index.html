@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Forge</title>
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header id="topbar">
+    <div class="brand">⚒ Forge</div>
+    <div id="workbench-info" class="workbench-info">
+      <span id="wb-name">—</span>
+      <span id="wb-path" class="muted"></span>
+    </div>
+    <div class="topbar-actions">
+      <button id="pick-workbench" class="ghost">Switch Workbench…</button>
+      <button id="refresh" class="ghost" title="Refresh (R)">↻ Refresh</button>
+    </div>
+  </header>
+
+  <main id="layout">
+    <aside id="sidebar">
+      <div class="sidebar-section">
+        <div class="section-title">Projects</div>
+        <ul id="project-list"></ul>
+        <div id="project-empty" class="muted hidden">No projects registered.</div>
+      </div>
+    </aside>
+
+    <section id="main-panel">
+      <nav id="tabs">
+        <button data-tab="status" class="tab active">Status</button>
+        <button data-tab="check" class="tab">Check</button>
+        <button data-tab="history" class="tab">History</button>
+        <button data-tab="toolchain" class="tab">Toolchain</button>
+      </nav>
+
+      <div id="tab-content">
+        <div data-tab="status"    class="panel active">
+          <div id="status-body" class="panel-body"></div>
+        </div>
+        <div data-tab="check"     class="panel">
+          <div class="panel-actions">
+            <button id="run-check" class="primary">Run check</button>
+            <span class="muted small">(equivalent to <code>forge check --no-update --json</code>)</span>
+          </div>
+          <div id="check-body" class="panel-body"></div>
+        </div>
+        <div data-tab="history"   class="panel">
+          <div id="history-body" class="panel-body"></div>
+        </div>
+        <div data-tab="toolchain" class="panel">
+          <div id="toolchain-body" class="panel-body"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="app.js"></script>
+</body>
+</html>

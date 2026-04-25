@@ -1,0 +1,20 @@
+id: nest
+label:
+  en: NestJS API server
+  ko: NestJS API 서버
+description:
+  en: NestJS API project
+  ko: NestJS API 서버 프로젝트
+type: nest
+defaultPackageManager: yarn
+command:
+  executable: npx
+  args:
+    - --yes
+    - "@nestjs/cli@latest"
+    - new
+    - "{{ projectName }}"
+    - --package-manager
+    - "{{ packageManager }}"
+    - --skip-git
+runIn: parent

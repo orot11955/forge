@@ -1,0 +1,8 @@
+id: generic
+label:
+  en: Empty project
+  ko: 빈 프로젝트
+description:
+  en: Empty directory with Forge metadata only
+  ko: 메타데이터만 있는 빈 프로젝트
+type: generic

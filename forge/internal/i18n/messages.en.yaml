@@ -1,0 +1,160 @@
+version:
+  current: "Forge version %s"
+
+config:
+  pathLabel: "Config path:"
+  languageSet: "Language set to %s"
+  invalidLanguage: "Invalid language: %s (supported: en, ko)"
+
+workbench:
+  initSuccess: "Workbench initialized at %s"
+  initExists: "Workbench already exists at %s"
+  initNothingChanged: "Nothing changed."
+  statusTitle: "Workbench Status"
+  rootLabel: "Root:"
+  idLabel: "ID:"
+  projectsLabel: "Projects:"
+  defaultLabel: "Default:"
+  defaultTrue: "true"
+  defaultFalse: "false"
+  initDefaultSet: "Default Workbench: %s"
+  initDefaultExists: "Default Workbench is already set: %s"
+  initDefaultChangeHint: "To change it: forge work use %s"
+  notFound: "Workbench not found."
+  notFoundHint1: "Run one of the following:"
+  notFoundHint2a: "  forge work init ~/Workbench"
+  notFoundHint2b: "  forge status --workbench ~/Workbench"
+
+project:
+  initSuccess: "Project initialized: %s"
+  initExists: "Project already initialized at %s"
+  initRunStatus: "Run 'forge status' to view project state."
+  notFound: "Project Root not found."
+  notFoundHint1: "Run one of the following:"
+  notFoundHint2a: "  forge init"
+  notFoundHint2b: "  cd <forge-project>"
+  statusTitle: "Project Status"
+  nameLabel: "Project:"
+  typeLabel: "Type:"
+  statusLabel: "Status:"
+  locationLabel: "Location:"
+  pathLabel: "Path:"
+  workbenchLabel: "Workbench:"
+  lifecycleLabel: "Lifecycle:"
+  contextSection: "Context"
+  lifecycleSection: "Lifecycle"
+  templateLabel: "Template:"
+  currentLabel: "Current:"
+
+check:
+  title: "Check Result"
+  requiredPassed: "Required checks passed."
+  requiredFailed: "Required checks failed."
+  optionalFailed: "Some optional checks failed."
+  lifecycleTransition: "Lifecycle:"
+  lifecycleArrow: "%s → %s"
+  lifecycleUnchanged: "Lifecycle unchanged."
+  nextSuggestion: "Next suggested command:"
+
+list:
+  title: "Projects in %s"
+  empty: "No projects registered."
+  headerName: "NAME"
+  headerType: "TYPE"
+  headerStatus: "STATUS"
+  headerLocation: "LOCATION"
+  headerPath: "PATH"
+  headerState: "STATE"
+
+create:
+  unknownType: "Unknown project type: %s (supported: generic, next, nest, go, java)"
+  pathExists: "Target path already exists and is not empty: %s"
+  running: "Running:"
+  rolledBack: "Rolled back: removed empty directory %s"
+  rollbackKept: "Directory not empty; left in place: %s"
+  success: "Project created: %s at %s"
+  dryRunHeader: "Dry run — no files will be written."
+  dryRunPlan: "Plan:"
+
+gen:
+  wrote: "wrote %s"
+  exists: "exists (use --force to overwrite): %s"
+  dryRunHeader: "Dry run — no files will be written."
+  done: "Generation finished."
+  unsupportedType: "Unsupported project type for generation: %s"
+
+run:
+  scriptNotFound: "Script not found: %s"
+  scriptListHeader: "Available scripts:"
+  starting: "Running %s"
+  exitCode: "Exit code: %d"
+
+logs:
+  title: "Command logs:"
+  empty: "No logs found."
+
+tool:
+  showTitle: "Toolchain"
+  doctorTitle: "Toolchain Doctor"
+  policyLabel: "Policy:"
+  runtimesLabel: "Runtimes"
+  pmsLabel: "Package managers"
+  systemLabel: "System tools"
+  none: "(none declared)"
+  ok: "ok"
+  missing: "missing"
+  versionUnknown: "version unknown"
+
+git:
+  notRepo: "Not a Git repository: %s"
+  statusTitle: "Git Status"
+  branchLabel: "Branch:"
+  remoteLabel: "Remotes:"
+  cleanLabel: "Clean working tree"
+  dirtyLabel: "Uncommitted changes:"
+  noRemote: "(no remotes)"
+  noUpstream: "(no upstream)"
+
+docker:
+  daemonUp: "Docker daemon: reachable"
+  daemonDown: "Docker daemon: unreachable"
+  notInstalled: "docker is not installed"
+  destructiveConfirm: "About to run a destructive Docker operation. Continue?"
+  cancelled: "Cancelled."
+
+compose:
+  noFile: "No compose file found in %s (looked for docker-compose.yml, compose.yaml, compose.yml)"
+  fileLabel: "Compose file:"
+  envMissing: ".env not found in project root (compose env_file may fail)"
+  destructiveConfirm: "This will stop and remove containers. Continue?"
+  cancelled: "Cancelled."
+
+deploy:
+  noTargets: "No targets defined. Create .forge/targets.yaml first."
+  unknownTarget: "Unknown target: %s"
+  unsupportedType: "Unsupported deploy type: %s"
+  dryRunHeader: "Dry run — no remote commands will be executed."
+  planTitle: "Deploy plan:"
+  starting: "Deploying to %s"
+  step: "→ %s"
+  healthOk: "Healthcheck OK (%d)"
+  healthFail: "Healthcheck failed: %s"
+  success: "Deploy succeeded: %s"
+  failure: "Deploy failed: %s"
+  gitDirty: "Working tree is dirty. Commit or stash before deploying."
+  branchMismatch: "Branch mismatch: local=%s, target=%s"
+
+doctor:
+  title: "Forge Doctor"
+  configLabel: "Global config:"
+  workbenchLabel: "Default workbench:"
+  workbenchYamlLabel: "Workbench YAML:"
+  registryLabel: "Registry:"
+  projectLabel: "Project root:"
+  projectYamlLabel: "Project YAML:"
+  gitLabel: "Git:"
+  dockerLabel: "Docker:"
+  sshLabel: "SSH:"
+  ok: "ok"
+  missing: "missing"
+  notFound: "not found"
