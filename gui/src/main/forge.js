@@ -34,13 +34,14 @@ function resolveBinary() {
 }
 
 // run returns { stdout, stderr, exitCode }. It only rejects when the binary
-// itself cannot be spawned (ENOENT etc.).
+// cannot be spawned (ENOENT / ENOEXEC / EACCES), triggering a PATH fallback.
 function run(args, opts = {}) {
   const env = { ...process.env, ...(opts.env || {}) };
   const cwd = opts.cwd;
+  const isSpawnFailure = (e) => e && (e.code === 'ENOENT' || e.code === 'ENOEXEC' || e.code === 'EACCES');
   const exec = (binary) => new Promise((resolve, reject) => {
     execFile(binary, args, { env, cwd, maxBuffer: 8 * 1024 * 1024 }, (err, stdout, stderr) => {
-      if (err && err.code === 'ENOENT') return reject(err);
+      if (isSpawnFailure(err)) return reject(err);
       resolve({
         stdout: String(stdout || ''),
         stderr: String(stderr || ''),
@@ -49,7 +50,7 @@ function run(args, opts = {}) {
     });
   });
   return exec(resolveBinary()).catch((err) => {
-    if (err && err.code === 'ENOENT') return exec('forge'); // PATH fallback
+    if (isSpawnFailure(err)) return exec('forge'); // PATH fallback
     throw err;
   });
 }
@@ -101,30 +102,47 @@ async function callPlain(args, opts = {}) {
 function streamRun(args, opts = {}, onEvent = () => {}) {
   const env = { ...process.env, ...(opts.env || {}) };
   const cwd = opts.cwd;
-  const binary = resolveBinary();
-  const child = spawn(binary, args, { env, cwd });
 
   const emit = (kind, data) => {
     try { onEvent({ kind, data }); } catch { /* swallow */ }
   };
 
-  child.stdout.on('data', (chunk) => emit('stdout', chunk.toString('utf8')));
-  child.stderr.on('data', (chunk) => emit('stderr', chunk.toString('utf8')));
+  const isSpawnErr = (e) => e && (e.code === 'ENOENT' || e.code === 'ENOEXEC' || e.code === 'EACCES');
+
+  function spawnBinary(binary) {
+    const child = spawn(binary, args, { env, cwd });
+    child.stdout.on('data', (chunk) => emit('stdout', chunk.toString('utf8')));
+    child.stderr.on('data', (chunk) => emit('stderr', chunk.toString('utf8')));
+    return child;
+  }
+
+  let child = spawnBinary(resolveBinary());
+
+  const killRef = { fn: (sig) => { try { child.kill(sig); } catch { /* swallow */ } } };
 
   const promise = new Promise((resolve) => {
-    child.on('close', (code, signal) => {
-      emit('exit', { code, signal });
-      resolve({ code, signal });
-    });
-    child.on('error', (err) => {
-      emit('error', { message: err.message, code: err.code });
-      resolve({ code: -1, signal: null, error: err });
-    });
+    const attach = (c, allowRetry) => {
+      c.on('close', (code, signal) => {
+        emit('exit', { code, signal });
+        resolve({ code, signal });
+      });
+      c.on('error', (err) => {
+        if (allowRetry && isSpawnErr(err)) {
+          child = spawnBinary('forge');
+          killRef.fn = (sig) => { try { child.kill(sig); } catch { /* swallow */ } };
+          attach(child, false);
+          return;
+        }
+        emit('error', { message: err.message, code: err.code });
+        resolve({ code: -1, signal: null, error: err });
+      });
+    };
+    attach(child, true);
   });
 
   return {
-    pid: child.pid,
-    kill: (sig = 'SIGTERM') => { try { child.kill(sig); } catch { /* swallow */ } },
+    get pid() { return child.pid; },
+    kill: (sig = 'SIGTERM') => killRef.fn(sig),
     promise,
   };
 }
