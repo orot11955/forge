@@ -129,7 +129,7 @@ func newWorkStatusCmd() *cobra.Command {
 			}
 			wcfg, err := workbench.Load(ctx.WorkbenchRoot)
 			if err != nil {
-				return err
+				return Coded(2, fmt.Errorf("read workbench.yaml: %w", err))
 			}
 			reg, err := workbench.LoadRegistry(ctx.WorkbenchRoot)
 			if err != nil {

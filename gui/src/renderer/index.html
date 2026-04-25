@@ -9,54 +9,119 @@
 </head>
 <body>
   <header id="topbar">
-    <div class="brand">⚒ Forge</div>
-    <div id="workbench-info" class="workbench-info">
-      <span id="wb-name">—</span>
-      <span id="wb-path" class="muted"></span>
+    <div class="brand">
+      <span class="brand-mark">⚒</span>
+      <span class="brand-name">Forge</span>
+      <span id="version-badge" class="badge subtle"></span>
     </div>
+
+    <button id="workbench-chip" class="chip" title="Switch Workbench">
+      <span class="chip-label">Workbench</span>
+      <span id="wb-name" class="chip-value">—</span>
+      <span id="wb-path" class="chip-sub"></span>
+      <span class="chip-caret">▾</span>
+    </button>
+
     <div class="topbar-actions">
-      <button id="pick-workbench" class="ghost">Switch Workbench…</button>
-      <button id="refresh" class="ghost" title="Refresh (R)">↻ Refresh</button>
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button data-lang="en" class="lang-btn active">EN</button>
+        <button data-lang="ko" class="lang-btn">KO</button>
+      </div>
+      <button id="open-doctor" class="ghost" title="Doctor">🩺 Doctor</button>
+      <button id="refresh" class="ghost" title="Refresh (⌘R)">↻</button>
     </div>
   </header>
 
   <main id="layout">
     <aside id="sidebar">
-      <div class="sidebar-section">
-        <div class="section-title">Projects</div>
-        <ul id="project-list"></ul>
-        <div id="project-empty" class="muted hidden">No projects registered.</div>
+      <div class="sidebar-head">
+        <div class="section-title">Projects <span id="project-count" class="count">0</span></div>
+        <button id="register-project" class="icon-btn" title="Register existing project">＋</button>
+      </div>
+      <div class="search-wrap">
+        <input id="project-search" type="search" placeholder="Filter projects…" autocomplete="off" />
+      </div>
+      <ul id="project-list" class="project-list"></ul>
+      <div id="project-empty" class="empty hidden">
+        <div class="empty-icon">📦</div>
+        <div class="empty-title">No projects yet</div>
+        <div class="empty-sub">Click ＋ to register an existing folder.</div>
       </div>
     </aside>
 
     <section id="main-panel">
-      <nav id="tabs">
-        <button data-tab="status" class="tab active">Status</button>
-        <button data-tab="check" class="tab">Check</button>
-        <button data-tab="history" class="tab">History</button>
+      <div id="project-header" class="project-header hidden">
+        <div class="ph-left">
+          <div id="ph-avatar" class="ph-avatar">F</div>
+          <div class="ph-meta">
+            <div class="ph-title">
+              <span id="ph-name">—</span>
+              <span id="ph-lifecycle" class="pill">—</span>
+              <span id="ph-location" class="pill subtle">—</span>
+            </div>
+            <div id="ph-path" class="ph-path muted"></div>
+          </div>
+        </div>
+        <div class="ph-right">
+          <button id="ph-open" class="ghost small" title="Open in file manager">Open ↗</button>
+        </div>
+      </div>
+
+      <nav id="tabs" class="tabs">
+        <button data-tab="overview"  class="tab active">Overview</button>
+        <button data-tab="checks"    class="tab">Checks</button>
+        <button data-tab="scripts"   class="tab">Scripts</button>
         <button data-tab="toolchain" class="tab">Toolchain</button>
+        <button data-tab="logs"      class="tab">Logs</button>
+        <button data-tab="history"   class="tab">History</button>
       </nav>
 
       <div id="tab-content">
-        <div data-tab="status"    class="panel active">
-          <div id="status-body" class="panel-body"></div>
-        </div>
-        <div data-tab="check"     class="panel">
-          <div class="panel-actions">
+        <div data-tab="overview"  class="panel active"><div id="overview-body"  class="panel-body"></div></div>
+        <div data-tab="checks"    class="panel">
+          <div class="panel-toolbar">
             <button id="run-check" class="primary">Run check</button>
-            <span class="muted small">(equivalent to <code>forge check --no-update --json</code>)</span>
+            <span class="muted small">forge check --no-update --json</span>
           </div>
-          <div id="check-body" class="panel-body"></div>
+          <div id="checks-body" class="panel-body"></div>
         </div>
-        <div data-tab="history"   class="panel">
-          <div id="history-body" class="panel-body"></div>
+        <div data-tab="scripts"   class="panel">
+          <div id="scripts-body" class="panel-body"></div>
+          <div id="run-console" class="run-console hidden">
+            <div class="run-head">
+              <div class="run-title"><span id="run-name">—</span> <span id="run-pid" class="muted small"></span></div>
+              <div class="run-actions">
+                <button id="run-stop" class="ghost small">Stop</button>
+                <button id="run-clear" class="ghost small">Clear</button>
+              </div>
+            </div>
+            <pre id="run-output" class="run-output"></pre>
+          </div>
         </div>
-        <div data-tab="toolchain" class="panel">
-          <div id="toolchain-body" class="panel-body"></div>
+        <div data-tab="toolchain" class="panel"><div id="toolchain-body" class="panel-body"></div></div>
+        <div data-tab="logs"      class="panel">
+          <div class="panel-toolbar">
+            <button id="reload-logs" class="ghost small">Reload</button>
+            <span class="muted small">forge logs --tail 200</span>
+          </div>
+          <div id="logs-body" class="panel-body"></div>
         </div>
+        <div data-tab="history"   class="panel"><div id="history-body" class="panel-body"></div></div>
       </div>
     </section>
   </main>
+
+  <!-- Doctor modal -->
+  <div id="doctor-modal" class="modal hidden">
+    <div class="modal-backdrop" data-close="1"></div>
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title">🩺 Doctor</div>
+        <button class="icon-btn" data-close="1" title="Close">✕</button>
+      </div>
+      <div id="doctor-body" class="modal-body"></div>
+    </div>
+  </div>
 
   <div id="toast" class="toast hidden"></div>
   <script src="app.js"></script>

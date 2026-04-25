@@ -10,7 +10,7 @@
 
 const path = require('node:path');
 const fs = require('node:fs');
-const { execFile } = require('node:child_process');
+const { execFile, spawn } = require('node:child_process');
 
 // Resolve the forge binary:
 //   1. FORGE_BIN env var
@@ -89,6 +89,46 @@ async function callJSON(args, opts = {}) {
 
 const callIn = (cwd, args) => callJSON(args, { cwd });
 
+// callPlain runs without --json (some commands produce only human output,
+// e.g. `forge config language <code>`). Returns { stdout, stderr, exitCode }.
+async function callPlain(args, opts = {}) {
+  return run(args, opts);
+}
+
+// streamRun spawns the forge binary and streams stdout/stderr to the
+// onEvent callback. Returns a controller with { kill, promise }. Used by
+// `forge run <script>` so the renderer can show live output.
+function streamRun(args, opts = {}, onEvent = () => {}) {
+  const env = { ...process.env, ...(opts.env || {}) };
+  const cwd = opts.cwd;
+  const binary = resolveBinary();
+  const child = spawn(binary, args, { env, cwd });
+
+  const emit = (kind, data) => {
+    try { onEvent({ kind, data }); } catch { /* swallow */ }
+  };
+
+  child.stdout.on('data', (chunk) => emit('stdout', chunk.toString('utf8')));
+  child.stderr.on('data', (chunk) => emit('stderr', chunk.toString('utf8')));
+
+  const promise = new Promise((resolve) => {
+    child.on('close', (code, signal) => {
+      emit('exit', { code, signal });
+      resolve({ code, signal });
+    });
+    child.on('error', (err) => {
+      emit('error', { message: err.message, code: err.code });
+      resolve({ code: -1, signal: null, error: err });
+    });
+  });
+
+  return {
+    pid: child.pid,
+    kill: (sig = 'SIGTERM') => { try { child.kill(sig); } catch { /* swallow */ } },
+    promise,
+  };
+}
+
 module.exports = {
   resolveBinary,
   version:    () => callJSON(['version']),
@@ -96,7 +136,13 @@ module.exports = {
   doctor:     (opts) => callJSON(['doctor'], opts),
   workStatus: (opts) => callJSON(['work', 'status'], opts),
   workInit:   (dir)  => callJSON(['work', 'init', dir]),
-  status:     (projectPath) => callIn(projectPath, ['status']),
-  check:      (projectPath) => callIn(projectPath, ['check', '--no-update']),
-  toolShow:   (projectPath) => callIn(projectPath, ['tool', 'show']),
+  status:     (projectPath, opts) => callIn(projectPath, ['status']),
+  check:      (projectPath, opts) => callIn(projectPath, ['check', ...(opts && opts.update ? [] : ['--no-update'])]),
+  toolShow:   (projectPath, opts) => callIn(projectPath, ['tool', 'show']),
+  scripts:    (projectPath) => callIn(projectPath, ['run']),
+  logs:       (projectPath, tail) => callIn(projectPath, ['logs', ...(tail ? ['--tail', String(tail)] : [])]),
+  projectInit: (projectPath, opts) => callIn(projectPath, ['init']),
+  setLanguage: (lang) => callPlain(['config', 'language', lang]),
+  configPath:  () => callJSON(['config', 'path']),
+  runScript:   (projectPath, name, onEvent) => streamRun(['run', name], { cwd: projectPath }, onEvent),
 };

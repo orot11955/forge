@@ -29,7 +29,7 @@ func newCheckCmd() *cobra.Command {
 			}
 			pcfg, err := project.Load(ctx.ProjectRoot)
 			if err != nil {
-				return err
+				return Coded(2, fmt.Errorf("read project.yaml: %w", err))
 			}
 			cf, err := checks.Load(project.ChecksPath(ctx.ProjectRoot))
 			if err != nil {

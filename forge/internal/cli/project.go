@@ -120,16 +120,21 @@ func newProjectStatusCmd() *cobra.Command {
 			}
 			pcfg, err := project.Load(ctx.ProjectRoot)
 			if err != nil {
-				return err
+				return Coded(2, fmt.Errorf("read project.yaml: %w", err))
 			}
 			if flags.JSON {
+				var tmpl any
+				if pcfg.Template != nil {
+					tmpl = *pcfg.Template
+				}
 				return writeJSON(cmd.OutOrStdout(), map[string]any{
 					"context": map[string]any{
-						"workbenchRoot": ctx.WorkbenchRoot,
-						"projectRoot":   ctx.ProjectRoot,
-						"projectType":   pcfg.Type,
-						"locationType":  pcfg.LocationType,
-						"language":      string(ctx.Lang),
+						"workbenchRoot":   ctx.WorkbenchRoot,
+						"projectRoot":     ctx.ProjectRoot,
+						"projectType":     pcfg.Type,
+						"projectTemplate": tmpl,
+						"locationType":    pcfg.LocationType,
+						"language":        string(ctx.Lang),
 					},
 					"project": map[string]any{
 						"id":   pcfg.ID,
@@ -184,13 +189,17 @@ func newProjectListCmd() *cobra.Command {
 			}
 
 			type entry struct {
-				ID           string `json:"id"`
-				Name         string `json:"name"`
-				Path         string `json:"path"`
-				Type         string `json:"type"`
-				Status       string `json:"status"`
-				LocationType string `json:"location_type"`
-				State        string `json:"state"`
+				ID            string  `json:"id"`
+				Name          string  `json:"name"`
+				Path          string  `json:"path"`
+				Type          string  `json:"type"`
+				Template      *string `json:"template"`
+				Status        string  `json:"status"`
+				LocationType  string  `json:"location_type"`
+				CreatedAt     string  `json:"created_at"`
+				UpdatedAt     string  `json:"updated_at"`
+				LastCheckedAt *string `json:"last_checked_at"`
+				State         string  `json:"state"`
 			}
 			out := make([]entry, 0, len(reg.Projects))
 			for _, p := range reg.Projects {
@@ -199,8 +208,17 @@ func newProjectListCmd() *cobra.Command {
 					state = "stale"
 				}
 				out = append(out, entry{
-					ID: p.ID, Name: p.Name, Path: p.Path, Type: p.Type,
-					Status: p.Status, LocationType: p.LocationType, State: state,
+					ID:            p.ID,
+					Name:          p.Name,
+					Path:          p.Path,
+					Type:          p.Type,
+					Template:      p.Template,
+					Status:        p.Status,
+					LocationType:  p.LocationType,
+					CreatedAt:     p.CreatedAt,
+					UpdatedAt:     p.UpdatedAt,
+					LastCheckedAt: p.LastCheckedAt,
+					State:         state,
 				})
 			}
 

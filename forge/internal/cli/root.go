@@ -15,7 +15,6 @@ type globalFlags struct {
 	Verbose   bool
 	Quiet     bool
 	Yes       bool
-	DryRun    bool
 }
 
 var flags = &globalFlags{}

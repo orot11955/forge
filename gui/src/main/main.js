@@ -1,6 +1,6 @@
 // Forge GUI — Electron main process.
 //
-// Design (Stage 11):
+// Design:
 //   - The CLI is the source of truth. The GUI never re-implements logic.
 //   - Every read goes through `forge --json`; mutating actions also delegate
 //     to the CLI so behavior stays identical to the terminal.
@@ -20,15 +20,16 @@ if (require('electron-squirrel-startup')) {
 }
 
 let mainWindow = null;
+const runningScripts = new Map(); // runId -> controller
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1180,
-    height: 760,
-    minWidth: 900,
-    minHeight: 600,
+    width: 1280,
+    height: 820,
+    minWidth: 980,
+    minHeight: 640,
     title: 'Forge',
-    backgroundColor: '#101216',
+    backgroundColor: '#0b0d12',
     webPreferences: {
       preload: path.join(__dirname, '..', 'preload', 'preload.js'),
       contextIsolation: true,
@@ -37,7 +38,11 @@ function createWindow() {
     },
   });
   mainWindow.loadFile(path.join(__dirname, '..', 'renderer', 'index.html'));
-  mainWindow.on('closed', () => { mainWindow = null; });
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+    for (const ctrl of runningScripts.values()) ctrl.kill();
+    runningScripts.clear();
+  });
 }
 
 app.whenReady().then(() => {
@@ -54,15 +59,23 @@ app.on('window-all-closed', () => {
 
 function registerIpc() {
   // Read-only forge calls — all return parsed JSON.
-  ipcMain.handle('forge:list',     async (_e, opts)               => forge.list(opts || {}));
-  ipcMain.handle('forge:status',   async (_e, projectPath, opts)  => forge.status(projectPath, opts || {}));
-  ipcMain.handle('forge:check',    async (_e, projectPath, opts)  => forge.check(projectPath, opts || {}));
-  ipcMain.handle('forge:doctor',   async (_e, opts)               => forge.doctor(opts || {}));
-  ipcMain.handle('forge:toolShow', async (_e, projectPath, opts)  => forge.toolShow(projectPath, opts || {}));
-  ipcMain.handle('forge:workStatus', async (_e, opts)             => forge.workStatus(opts || {}));
-  ipcMain.handle('forge:version',  async ()                       => forge.version());
+  ipcMain.handle('forge:list',       async (_e, opts)              => forge.list(opts || {}));
+  ipcMain.handle('forge:status',     async (_e, p, opts)           => forge.status(p, opts || {}));
+  ipcMain.handle('forge:check',      async (_e, p, opts)           => forge.check(p, opts || {}));
+  ipcMain.handle('forge:doctor',     async (_e, opts)              => forge.doctor(opts || {}));
+  ipcMain.handle('forge:toolShow',   async (_e, p, opts)           => forge.toolShow(p, opts || {}));
+  ipcMain.handle('forge:workStatus', async (_e, opts)              => forge.workStatus(opts || {}));
+  ipcMain.handle('forge:scripts',    async (_e, p)                 => forge.scripts(p));
+  ipcMain.handle('forge:logs',       async (_e, p, tail)           => forge.logs(p, tail));
+  ipcMain.handle('forge:projectInit', async (_e, p)                => forge.projectInit(p));
+  ipcMain.handle('forge:configPath', async ()                      => forge.configPath());
+  ipcMain.handle('forge:setLanguage', async (_e, lang)             => {
+    const { stdout, stderr, exitCode } = await forge.setLanguage(lang);
+    return { ok: exitCode === 0, stdout, stderr, exitCode };
+  });
+  ipcMain.handle('forge:version',    async ()                      => forge.version());
 
-  // Filesystem-side reads (history.jsonl) so the renderer never touches disk.
+  // history.jsonl tail (filesystem read in main so renderer can't touch disk).
   ipcMain.handle('history:tail', async (_e, projectPath, lines = 50) => {
     return readHistoryTail(projectPath, lines);
   });
@@ -78,6 +91,36 @@ function registerIpc() {
     return result.filePaths[0];
   });
   ipcMain.handle('workbench:init', async (_e, dir) => forge.workInit(dir));
+
+  // Project picking (for `forge init <existing project>`).
+  ipcMain.handle('project:pick', async () => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      title: 'Select Project Directory',
+      properties: ['openDirectory'],
+      defaultPath: os.homedir(),
+    });
+    if (result.canceled || !result.filePaths.length) return null;
+    return result.filePaths[0];
+  });
+
+  // Streaming run for `forge run <script>`.
+  ipcMain.handle('run:start', async (event, projectPath, scriptName) => {
+    const runId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+    const sender = event.sender;
+    const ctrl = forge.runScript(projectPath, scriptName, (evt) => {
+      if (sender.isDestroyed()) return;
+      sender.send('run:event', { runId, ...evt });
+    });
+    runningScripts.set(runId, ctrl);
+    ctrl.promise.finally(() => runningScripts.delete(runId));
+    return { runId, pid: ctrl.pid };
+  });
+  ipcMain.handle('run:stop', async (_e, runId) => {
+    const ctrl = runningScripts.get(runId);
+    if (!ctrl) return false;
+    ctrl.kill();
+    return true;
+  });
 
   // Open external links/paths in the system shell (Finder / Explorer / xdg).
   ipcMain.handle('shell:open', async (_e, target) => {

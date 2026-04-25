@@ -21,6 +21,7 @@ apps/docs/dist/
 .turbo/
 coverage/
 .codex
+CLAUDE.md
 
 # Logs
 *.log
